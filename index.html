@@ -2,240 +2,584 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design Your Dream Room (ESL Activity)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Design Your Dream Room</title>
 <style>
   :root {
-    --primary-color: #bbdefb;
-    --sidebar-bg: #e3f2fd;
-    --room-bg: #fffde7;
-    --floor-color: #d7ccc8;
-    --border-color: #a1887f;
-    --font-color: #333;
+    --bg: #f0f4f8;
+    --sidebar-bg: #ffffff;
+    --room-wall: #fdf6e3;
+    --room-floor: #c4a882;
+    --room-border: #8d6e4a;
+    --accent: #3b82f6;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,.08);
   }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; gap: 20px; padding: 20px; background: #fafafa; color: var(--font-color); margin: 0; }
-  #main-container { display: flex; flex-grow: 1; max-width: 1000px; margin: auto; }
-  
-  /* 側邊欄：家具選擇 */
-  #sidebar { width: 260px; background: var(--sidebar-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0; }
-  h3 { color: #1565c0; text-align: center; }
-  p.tip { font-size: 13px; color: #666; margin-top: -10px; margin-bottom: 20px; text-align: center; }
-  .item-btn { display: flex; align-items: center; width: 100%; margin: 10px 0; padding: 12px 15px; border: none; border-radius: 8px; cursor: pointer; text-align: left; font-weight: bold; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .item-btn:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-  .item-btn svg { width: 28px; height: 28px; margin-right: 12px; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f172a;
+      --sidebar-bg: #1e293b;
+      --room-wall: #334155;
+      --room-floor: #5c4a32;
+      --room-border: #78716c;
+      --accent: #60a5fa;
+      --text: #e2e8f0;
+      --text-light: #94a3b8;
+      --shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f172a;
+    --sidebar-bg: #1e293b;
+    --room-wall: #334155;
+    --room-floor: #5c4a32;
+    --room-border: #78716c;
+    --accent: #60a5fa;
+    --text: #e2e8f0;
+    --text-light: #94a3b8;
+    --shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
 
-  /* 具體按鈕顏色：呼應圖片設計 */
-  .btn-pink { background: #ff80ab; color: white; } .btn-pink:hover { background: #ff4081; }
-  .btn-blue { background: #42a5f5; color: white; } .btn-blue:hover { background: #1e88e5; }
-  .btn-green { background: #66bb6a; color: white; } .btn-green:hover { background: #43a047; }
-  .btn-yellow { background: #ffee58; color: #333; } .btn-yellow:hover { background: #fdd835; }
-  .btn-orange { background: #ffa726; color: white; } .btn-orange:hover { background: #fb8c00; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* 房間畫布 */
-  #room { width: 600px; height: 450px; background: var(--room-bg); border: 6px solid var(--border-color); position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); cursor: default; }
-  #floor { position: absolute; bottom: 0; width: 100%; height: 120px; background: var(--floor-color); }
-  
-  /* 放置在房間內的物品 */
-  .placed-item { position: absolute; cursor: move; user-select: none; transition: transform 0.1s; }
-  .placed-item.dragging { opacity: 0.8; transform: scale(1.05); }
-  .placed-item-label { display: block; text-align: center; font-size: 11px; margin-top: 5px; color: #666; font-weight: bold; }
-  
-  /* 家具圖案大小設定 */
-  .placed-item svg { width: 100%; height: 100%; }
-  .item-bed { width: 150px; height: auto; }
-  .item-sofa { width: 130px; height: auto; }
-  .item-plant { width: 60px; height: auto; }
-  .item-lamp { width: 70px; height: auto; }
-  .item-cat { width: 50px; height: auto; }
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
 
-  /* 完成按鈕與結果區域 */
-  #result-panel { width: 260px; padding: 20px; text-align: center; }
-  #finish-btn { background: #2e7d32; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; transition: background 0.2s; }
-  #finish-btn:hover { background: #1b5e20; }
-  #result-panel p.description { color: #666; font-size: 14px; margin-top: 15px; }
-  #性格分析 { font-size: 18px; color: #1565c0; font-weight: bold; margin-top: 10px; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 100%;
+  }
+  html, body { height: 100%; }
+
+  h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+
+  .app {
+    display: flex;
+    gap: 16px;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .sidebar-tip {
+    font-size: .8rem;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .item-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #fff;
+    transition: filter .15s, transform .1s;
+    box-shadow: 0 2px 4px rgba(0,0,0,.12);
+  }
+  .item-btn:hover { filter: brightness(1.08); }
+  .item-btn:active { transform: scale(.97); }
+  .item-btn .emoji { font-size: 1.5rem; line-height: 1; }
+
+  .btn-bed    { background: #ec4899; }
+  .btn-sofa   { background: #3b82f6; }
+  .btn-plant  { background: #22c55e; }
+  .btn-lamp   { background: #eab308; color: #1e293b; }
+  .btn-desk   { background: #a855f7; }
+  .btn-cat    { background: #f97316; }
+
+  /* ── Room ── */
+  .room-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  .room {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 460px;
+    background: var(--room-wall);
+    border: 5px solid var(--room-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: default;
+    box-shadow: var(--shadow);
+    touch-action: none;
+  }
+  .floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28%;
+    background: var(--room-floor);
+    border-top: 2px solid var(--room-border);
+  }
+  .room-empty-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    color: var(--text-light);
+    font-size: .95rem;
+    opacity: .6;
+    text-align: center;
+    padding: 20px;
+    z-index: 0;
+  }
+
+  /* ── Placed items ── */
+  .placed {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: filter .1s;
+    z-index: 1;
+  }
+  .placed:active { cursor: grabbing; }
+  .placed.dragging { filter: drop-shadow(0 4px 12px rgba(0,0,0,.25)); z-index: 999 !important; }
+  .placed .icon { font-size: 48px; line-height: 1; pointer-events: none; }
+  .placed .label {
+    font-size: .65rem;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-top: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+    background: rgba(255,255,255,.7);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .placed .delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    display: none;
+    z-index: 1000;
+  }
+  .placed:hover .delete-btn { display: block; }
+
+  /* ── Right panel ── */
+  .panel {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .finish-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s;
+    margin-top: 12px;
+  }
+  .finish-btn:hover { background: #15803d; }
+
+  .clear-btn {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    background: transparent;
+    color: #ef4444;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background .15s, color .15s;
+  }
+  .clear-btn:hover { background: #ef4444; color: #fff; }
+
+  /* ── Result ── */
+  .result { margin-top: 16px; }
+  .result-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .result-list {
+    font-size: .85rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .result-sentence {
+    background: #eff6ff;
+    border-left: 3px solid var(--accent);
+    padding: 8px 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: .85rem;
+    line-height: 1.55;
+    margin-bottom: 6px;
+    color: #1e293b;
+  }
+  .result-prompt {
+    font-size: .8rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin-top: 10px;
+  }
+  .analysis-card {
+    background: linear-gradient(135deg, #fdf2f8, #ede9fe);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .analysis-type {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #7c3aed;
+    margin-bottom: 4px;
+  }
+  .analysis-text {
+    font-size: .82rem;
+    line-height: 1.5;
+    color: #4a044e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .analysis-card {
+      background: linear-gradient(135deg, #3b0764, #1e1b4b);
+    }
+    :root:not([data-theme="light"]) .analysis-type { color: #c4b5fd; }
+    :root:not([data-theme="light"]) .analysis-text { color: #e9d5ff; }
+    :root:not([data-theme="light"]) .result-sentence { background: #1e293b; color: #e2e8f0; }
+  }
+  :root[data-theme="dark"] .analysis-card {
+    background: linear-gradient(135deg, #3b0764, #1e1b4b);
+  }
+  :root[data-theme="dark"] .analysis-type { color: #c4b5fd; }
+  :root[data-theme="dark"] .analysis-text { color: #e9d5ff; }
+  :root[data-theme="dark"] .result-sentence { background: #1e293b; color: #e2e8f0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .app { flex-direction: column; align-items: stretch; }
+    .sidebar {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .sidebar h2, .sidebar .sidebar-tip { width: 100%; }
+    .item-btn { width: auto; flex: 1; min-width: 120px; margin-bottom: 0; }
+    .panel { width: 100%; }
+  }
 </style>
 </head>
 <body>
 
-<div id="main-container">
-  <div id="sidebar">
-    <h3>🛋️ ESL Room Design</h3>
-    <p class="tip">Click items to place them in the room!</p>
-    
-    <button class="item-btn btn-pink" onclick="addItem('🛏️ Pink Bed')">
-      <svg viewBox="0 0 576 512" fill="white"><path d="M512 64h-320v-32c0-17.67-14.33-32-32-32h-64c-17.67 0-32 14.33-32 32v32H32C14.33 64 0 78.33 0 96v288c0 17.67 14.33 32 32 32h32v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h32c17.67 0 32-14.33 32-32V96c0-17.67-14.33-32-32-32zm-320 288v32c0 17.67-14.33 32-32 32h-32c-17.67 0-32-14.33-32-32v-32H32c-17.67 0-32-14.33-32-32V256h224v96h192zM320 320h-192V96h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V96h32v192h192v64H320z"></path></svg>
-      + Pink Bed
-    </button>
-    <button class="item-btn btn-blue" onclick="addItem('🛋️ Blue Sofa')">
-      <svg viewBox="0 0 640 512" fill="white"><path d="M608 288c-17.67 0-32 14.33-32 32V416H320V288c0-17.67-14.33-32-32-32H32C14.33 256 0 270.33 0 288V416h64v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h32v-32c0-17.67-14.33-32-32-32zm32-128H0c0-17.67 14.33-32 32-32h224V64c0-17.67 14.33-32 32-32h64c17.67 0 32 14.33 32 32v64h224c17.67 0 32 14.33 32 32zm0 128h-224V128h224v64c0 17.67-14.33 32-32 32z"></path></svg>
-      + Blue Sofa
-    </button>
-    <button class="item-btn btn-green" onclick="addItem('🪴 Green Plant')">
-      <svg viewBox="0 0 512 512" fill="white"><path d="M128 64c0-35.3 28.7-64 64-64h128c35.3 0 64 28.7 64 64v192c0 35.3-28.7 64-64 64H192c-35.3 0-64-28.7-64-64V64zm352 64h-32V96c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-32h32c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zM32 128c17.7 0 32 14.3 32 32v64c0 17.7 14.3 32 32 32h32V96c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h32v-32H32c-17.7 0-32-14.3-32-32v-64c0-17.7 14.3-32 32-32zM288 384H192c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32z"></path></svg>
-      + Green Plant
-    </button>
-    <button class="item-btn btn-yellow" onclick="addItem('💡 Yellow Lamp')">
-      <svg viewBox="0 0 448 512" fill="#333"><path d="M224 0C100.3 0 0 100.3 0 224v192c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V224C448 100.3 347.7 0 224 0zm0 416H96V224c0-17.7 14.3-32 32-32h192c17.7 0 32 14.3 32 32v192h-128z"></path></svg>
-      + Yellow Lamp
-    </button>
-    <button class="item-btn btn-orange" onclick="addItem('🐱 Cute Cat')">
-      <svg viewBox="0 0 512 512" fill="white"><path d="M480 32H32c-17.7 0-32 14.3-32 32v384c0 17.7 14.3 32 32 32h448c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm-320 224c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32v64c0 17.7-14.3 32-32 32zm192 0c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32v64c0 17.7-14.3 32-32 32zm0 128H160V320h192v64z"></path></svg>
-      + Cute Cat
-    </button>
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🏠 Room Designer</h2>
+    <p class="sidebar-tip">Click to add furniture. Drag to move. Hover & tap ✕ to remove.</p>
+
+    <button class="item-btn btn-bed"   onclick="addItem('bed')"><span class="emoji">🛏️</span> Pink Bed</button>
+    <button class="item-btn btn-sofa"  onclick="addItem('sofa')"><span class="emoji">🛋️</span> Blue Sofa</button>
+    <button class="item-btn btn-plant" onclick="addItem('plant')"><span class="emoji">🪴</span> Green Plant</button>
+    <button class="item-btn btn-lamp"  onclick="addItem('lamp')"><span class="emoji">💡</span> Yellow Lamp</button>
+    <button class="item-btn btn-desk"  onclick="addItem('desk')"><span class="emoji">📚</span> Study Desk</button>
+    <button class="item-btn btn-cat"   onclick="addItem('cat')"><span class="emoji">🐱</span> Cute Cat</button>
   </div>
 
-  <div id="room">
-    <div id="floor"></div>
+  <!-- Room -->
+  <div class="room-wrap">
+    <div class="room" id="room">
+      <div class="floor"></div>
+      <div class="room-empty-hint" id="empty-hint">Click a button on the left to start decorating!</div>
+    </div>
   </div>
 
-  <div id="result-panel">
-    <h3>My Room Design</h3>
-    <button id="finish-btn" onclick="finishDesign()">Finish & Analyse</button>
-    <div id="result-description"></div>
+  <!-- Right panel -->
+  <div class="panel">
+    <h2>My Room</h2>
+    <p style="font-size:.8rem;color:var(--text-light);margin-top:4px;">Design your dream room, then practice describing it in English!</p>
+    <button class="finish-btn" onclick="finishDesign()">✨ Describe My Room</button>
+    <button class="clear-btn" onclick="clearRoom()">🗑 Start Over</button>
+    <div class="result" id="result"></div>
   </div>
 </div>
 
 <script>
-// 不同家具的 SVG 和類別設定
-const itemDefs = {
-  '🛏️ Pink Bed': { type: 'item-bed', svg: '<svg viewBox="0 0 576 512" fill="#ff80ab"><path d="M512 64h-320v-32c0-17.67-14.33-32-32-32h-64c-17.67 0-32 14.33-32 32v32H32C14.33 64 0 78.33 0 96v288c0 17.67 14.33 32 32 32h32v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h32c17.67 0 32-14.33 32-32V96c0-17.67-14.33-32-32-32zm-320 288v32c0 17.67-14.33 32-32 32h-32c-17.67 0-32-14.33-32-32v-32H32c-17.67 0-32-14.33-32-32V256h224v96h192zM320 320h-192V96h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32 14.33 32 32V96h32v192h192v64H320z"></path></svg>', short: 'Pink Bed' },
-  '🛋️ Blue Sofa': { type: 'item-sofa', svg: '<svg viewBox="0 0 640 512" fill="#42a5f5"><path d="M608 288c-17.67 0-32 14.33-32 32V416H320V288c0-17.67-14.33-32-32-32H32C14.33 256 0 270.33 0 288V416h64v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h160v32c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-32h32v-32c0-17.67-14.33-32-32-32zm32-128H0c0-17.67 14.33-32 32-32h224V64c0-17.67 14.33-32 32-32h64c17.67 0 32 14.33 32 32v64h224c17.67 0 32 14.33 32 32zm0 128h-224V128h224v64c0 17.67-14.33 32-32 32z"></path></svg>', short: 'Blue Sofa' },
-  '🪴 Green Plant': { type: 'item-plant', svg: '<svg viewBox="0 0 512 512" fill="#66bb6a"><path d="M128 64c0-35.3 28.7-64 64-64h128c35.3 0 64 28.7 64 64v192c0 35.3-28.7 64-64 64H192c-35.3 0-64-28.7-64-64V64zm352 64h-32V96c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32v-32h32c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32zM32 128c17.7 0 32 14.3 32 32v64c0 17.7 14.3 32 32 32h32V96c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h32v-32H32c-17.7 0-32-14.3-32-32v-64c0-17.7 14.3-32 32-32zM288 384H192c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32v-64c0-17.7-14.3-32-32-32z"></path></svg>', short: 'Green Plant' },
-  '💡 Yellow Lamp': { type: 'item-lamp', svg: '<svg viewBox="0 0 448 512" fill="#ffee58"><path d="M224 0C100.3 0 0 100.3 0 224v192c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V224C448 100.3 347.7 0 224 0zm0 416H96V224c0-17.7 14.3-32 32-32h192c17.7 0 32 14.3 32 32v192h-128z"></path></svg>', short: 'Yellow Lamp' },
-  '🐱 Cute Cat': { type: 'item-cat', svg: '<svg viewBox="0 0 512 512" fill="#ffa726"><path d="M480 32H32c-17.7 0-32 14.3-32 32v384c0 17.7 14.3 32 32 32h448c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zm-320 224c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32v64c0 17.7-14.3 32-32 32zm192 0c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32v64c0 17.7-14.3 32-32 32zm0 128H160V320h192v64z"></path></svg>', short: 'Cute Cat' }
+const ITEMS = {
+  bed:   { emoji: '🛏️', label: 'Pink Bed',    article: 'a' },
+  sofa:  { emoji: '🛋️', label: 'Blue Sofa',   article: 'a' },
+  plant: { emoji: '🪴',  label: 'Green Plant', article: 'a' },
+  lamp:  { emoji: '💡',  label: 'Yellow Lamp', article: 'a' },
+  desk:  { emoji: '📚',  label: 'Study Desk',  article: 'a' },
+  cat:   { emoji: '🐱',  label: 'Cute Cat',    article: 'a' },
 };
 
-let placedItemCounts = {}; // 用於統計擺放的物品數量
-const zIndexTop = 100; // 用於確保拖曳的物品在最上層
+let placedItems = []; // { key, el }
+let nextZ = 1;
 
-// 在房間內加入家具
-function addItem(itemName) {
+function addItem(key) {
   const room = document.getElementById('room');
-  const roomRect = room.getBoundingClientRect();
-  const def = itemDefs[itemName];
-  
+  const def = ITEMS[key];
   if (!def) return;
 
-  // 統計數量
-  placedItemCounts[def.short] = (placedItemCounts[def.short] || 0) + 1;
+  document.getElementById('empty-hint').style.display = 'none';
 
-  // 創建主元件
-  const div = document.createElement('div');
-  div.className = `placed-item ${def.type}`;
-  div.innerHTML = `${def.svg}<span class="placed-item-label">${def.short}</span>`;
-  
-  // 設定初始位置（在房間中央稍微偏上的位置生成）
-  const initialX = (roomRect.width / 2) - 50; 
-  const initialY = 150;
-  div.style.left = initialX + 'px';
-  div.style.top = initialY + 'px';
-  div.style.zIndex = placedItemCounts[def.short]; // 新產生的在上一層
-
-  // 處理拖曳邏輯
-  setupDragging(div, roomRect);
-  
-  room.appendChild(div);
-}
-
-// 設定拖曳邏輯（兼容桌布與手機）
-function setupDragging(div, roomRect) {
-  div.onmousedown = startDragging;
-  div.ontouchstart = startDragging;
-
-  function startDragging(e) {
-    e.preventDefault();
-    const event = e.touches ? e.touches[0] : e;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    
-    // 獲取元件目前的位置
-    const rect = div.getBoundingClientRect();
-    const shiftX = startX - rect.left;
-    const shiftY = startY - rect.top;
-
-    div.classList.add('dragging');
-    div.style.zIndex = zIndexTop; // 拖曳時置頂
-
-    function moveAt(pageX, pageY) {
-      // 計算並設定新位置，限制在房間內
-      let left = pageX - roomRect.left - shiftX;
-      let top = pageY - roomRect.top - shiftY;
-      
-      // 簡單邊界限制
-      if (left < 0) left = 0;
-      if (left > roomRect.width - rect.width) left = roomRect.width - rect.width;
-      if (top < 0) top = 0;
-      if (top > roomRect.height - rect.height) top = roomRect.height - rect.height;
-
-      div.style.left = left + 'px';
-      div.style.top = top + 'px';
-    }
-
-    function onMouseMove(moveEvent) {
-      const eventMove = moveEvent.touches ? moveEvent.touches[0] : moveEvent;
-      moveAt(eventMove.pageX, eventMove.pageY);
-    }
-
-    // 將事件綁定到 document，確保滑鼠移出元件或房間外也能追蹤
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('touchmove', onMouseMove);
-
-    // 停止拖曳
-    function stopDragging() {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('touchmove', onMouseMove);
-      document.removeEventListener('mouseup', stopDragging);
-      document.removeEventListener('touchend', stopDragging);
-      div.classList.remove('dragging');
-      // 將 z-index 還原（比目前層數高 1）
-      div.style.zIndex = placedItemCounts[itemDefs[div.querySelector('span').innerText].short] + 1;
-    }
-
-    document.addEventListener('mouseup', stopDragging);
-    document.addEventListener('touchend', stopDragging);
-  }
-}
-
-// 完成設計並分析性格
-function finishDesign() {
-  const resultDescription = document.getElementById('result-description');
-  const counts = placedItemCounts;
-  
-  let personalityType = '';
-  let personalityText = '';
-  
-  // 基於統計數據的簡單心理測驗結論（國中英文）
-  if (counts['Pink Bed'] && counts['Cute Cat']) {
-    personalityType = 'The Nature Lover 🐱';
-    personalityText = 'You love nature and quiet times! You want a soft bed and a furry cat to be your best friend. A cozy room is your dream.';
-  } else if (counts['Yellow Lamp'] && counts['Green Plant']) {
-    personalityType = 'The Warm Designer 💡';
-    personalityText = 'You want a warm room! You like green plants and soft light. You are a peaceful and nature-loving person!';
-  } else if (counts['Pink Bed'] && counts['Blue Sofa'] && counts['Study Desk']) {
-    personalityType = 'The Practical Planner 🛏️';
-    personalityText = 'You like to plan. You need a place to rest (bed and sofa) and a place to work. You are practical and serious!';
-  } else if (counts['Cute Cat'] && counts['Study Desk']) {
-    personalityType = 'The Creative Student 📖';
-    personalityText = 'You are creative! You want to study or create things, but you also want a playful cat. You have many good ideas!';
-  } else if (counts['Blue Sofa'] && counts['Yellow Lamp']) {
-    personalityType = 'The Chic Relaxer 🛋️';
-    personalityText = 'You love comfort and style! A sofa and a chic lamp mean you like to relax and enjoy your time at home.';
-  } else if (Object.keys(counts).length === 0) {
-    personalityType = 'The Minimalist Student 🧹';
-    personalityText = 'You like it clean! A minimalist room means you are focused and do not want busy things!';
-  } else {
-    // 預設结论
-    personalityType = 'The Cozy Creator 🪴';
-    personalityText = 'You have so many wonderful ideas! You want a creative and comfortable room where you can dream. You are a good friend!';
-  }
-
-  // 顯示結果
-  resultDescription.innerHTML = `
-    <p class="description">Gemini Analysed Your Design!</p>
-    <div id="性格分析">You are: ${personalityType}</div>
-    <p class="description">${personalityText}</p>
+  const el = document.createElement('div');
+  el.className = 'placed';
+  el.dataset.key = key;
+  el.innerHTML = `
+    <button class="delete-btn" title="Remove">✕</button>
+    <span class="icon">${def.emoji}</span>
+    <span class="label">${def.label}</span>
   `;
+
+  // Place near center with slight random offset
+  const rw = room.clientWidth;
+  const rh = room.clientHeight;
+  el.style.left = (rw / 2 - 30 + (Math.random() - 0.5) * 80) + 'px';
+  el.style.top  = (rh * 0.35 + (Math.random() - 0.5) * 60) + 'px';
+  el.style.zIndex = nextZ++;
+
+  // Delete button
+  el.querySelector('.delete-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    el.remove();
+    placedItems = placedItems.filter(p => p.el !== el);
+    if (placedItems.length === 0) {
+      document.getElementById('empty-hint').style.display = 'flex';
+    }
+  });
+
+  // Drag setup
+  setupDrag(el, room);
+
+  room.appendChild(el);
+  placedItems.push({ key, el });
+}
+
+function setupDrag(el, room) {
+  let dragging = false;
+  let shiftX, shiftY;
+
+  function onStart(e) {
+    e.preventDefault();
+    const ev = e.touches ? e.touches[0] : e;
+    const rect = el.getBoundingClientRect();
+    shiftX = ev.clientX - rect.left;
+    shiftY = ev.clientY - rect.top;
+    el.classList.add('dragging');
+    el.style.zIndex = nextZ++;
+    dragging = true;
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const ev = e.touches ? e.touches[0] : e;
+    const roomRect = room.getBoundingClientRect();
+    let left = ev.clientX - roomRect.left - shiftX;
+    let top  = ev.clientY - roomRect.top - shiftY;
+
+    // Keep inside the room
+    const elW = el.offsetWidth;
+    const elH = el.offsetHeight;
+    left = Math.max(0, Math.min(left, room.clientWidth - elW));
+    top  = Math.max(0, Math.min(top, room.clientHeight - elH));
+
+    el.style.left = left + 'px';
+    el.style.top  = top + 'px';
+  }
+
+  function onEnd() {
+    dragging = false;
+    el.classList.remove('dragging');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchend', onEnd);
+  }
+
+  el.addEventListener('mousedown', onStart);
+  el.addEventListener('touchstart', onStart, { passive: false });
+}
+
+function clearRoom() {
+  placedItems.forEach(p => p.el.remove());
+  placedItems = [];
+  nextZ = 1;
+  document.getElementById('empty-hint').style.display = 'flex';
+  document.getElementById('result').innerHTML = '';
+}
+
+function getAnalysis(counts, total) {
+  const has = (k) => (counts[k] || 0) > 0;
+  const many = (k) => (counts[k] || 0) >= 3;
+  const types = Object.keys(counts).length;
+
+  // Check from most specific to least
+  if (many('cat'))
+    return ['The Crazy Cat Person 🐱🐱🐱', "You put SO many cats in your room! You don't need furniture — you need a cat café. Your room is basically a cat party!"];
+  if (many('plant'))
+    return ['The Jungle Creator 🌿🌿🌿', "Your room is turning into a forest! You love nature so much that your friends might need a map to find you in there."];
+  if (many('lamp'))
+    return ['The Disco Designer 🪩✨', "So many lights! Your room is brighter than the sun. You could have a dance party in there every night!"];
+  if (total >= 8)
+    return ['The Maximalist 🎪', "More is more! Your room is FULL of cool stuff. You never say no to a good idea. Your room is like a treasure box!"];
+  if (types >= 5)
+    return ['The Interior Designer ✨', "You picked almost everything! You have great taste and want your room to be perfect. Maybe you'll design houses someday!"];
+  if (has('bed') && has('cat') && has('plant'))
+    return ['The Nature Lover 🌸', "A comfy bed, a cute cat, and green plants — you want your room to feel like a peaceful garden. You're calm and kind!"];
+  if (has('desk') && has('lamp') && !has('sofa'))
+    return ['The Future CEO 💼', "A desk and a lamp? You're serious about studying! No sofa because you don't have time to rest — you're too busy being amazing!"];
+  if (has('sofa') && has('cat'))
+    return ['The Professional Relaxer 😎', "A sofa and a cat? You know the secret to a happy life: sit down, pet the cat, and chill. You're a relaxation expert!"];
+  if (has('sofa') && has('lamp'))
+    return ['The Movie Night Pro 🎬', "A sofa and a lamp — the perfect setup for watching movies! All you need now is popcorn. Your friends probably love coming over!"];
+  if (has('desk') && has('plant'))
+    return ['The Zen Student 🧘', "Studying with plants around you? Smart! Green plants help you think better. Your room is calm, quiet, and full of good vibes."];
+  if (has('bed') && has('cat'))
+    return ['The Cozy Dreamer 😴', "A pink bed and a cute cat? You love being warm and comfy! You probably have the best naps in the whole school."];
+  if (has('bed') && has('desk'))
+    return ['The Balanced Student 📖', "A bed AND a desk — you know when to study and when to sleep! You're smart about how you use your time."];
+  if (has('cat') && has('desk'))
+    return ['The Multitasker 🌟', "Studying with a cat nearby? That cat is your study buddy! Just don't let it sit on your homework."];
+  if (has('bed') && has('sofa'))
+    return ['The Comfort King 👑', "A bed AND a sofa? You have TWO places to lie down! You really, really love being comfortable. We respect that."];
+  if (total === 1)
+    return ['The Minimalist 🧹', "Just one thing? You like your room simple and clean. Less stuff means less mess. Smart thinking!"];
+  if (has('lamp') && has('plant'))
+    return ['The Warm Designer 🌻', "A lamp and a plant — you want your room to feel warm and alive. Your room probably smells nice too!"];
+  if (has('cat') && !has('bed'))
+    return ['The Cat Café Owner ☕', "You have a cat but no bed?! Who needs sleep when you have a furry friend? Your cat is more important than everything!"];
+  return ['The Creative Decorator 🎨', "You have great ideas! Your room shows your personality — unique, creative, and full of style!"];
+}
+
+function finishDesign() {
+  const result = document.getElementById('result');
+
+  if (placedItems.length === 0) {
+    result.innerHTML = '<p class="result-prompt">Add some furniture first, then come back!</p>';
+    return;
+  }
+
+  // Count items
+  const counts = {};
+  placedItems.forEach(p => {
+    counts[p.key] = (counts[p.key] || 0) + 1;
+  });
+  const total = placedItems.length;
+
+  // Build item list display
+  let listHTML = '';
+  const entries = Object.entries(counts);
+  entries.forEach(([key, count]) => {
+    const def = ITEMS[key];
+    const plural = count > 1 ? 's' : '';
+    listHTML += `<div>${def.emoji} ${count} ${def.label}${plural}</div>`;
+  });
+
+  // Personality analysis
+  const [aType, aText] = getAnalysis(counts, total);
+
+  // Build sentences for speaking practice
+  const sentences = [];
+
+  // Sentence 1: "My room has..."
+  const nameList = entries.map(([key, count]) => {
+    const def = ITEMS[key];
+    if (count === 1) return `${def.article} ${def.label.toLowerCase()}`;
+    return `${numberWord(count)} ${def.label.toLowerCase()}s`;
+  });
+  sentences.push(`"My room has ${joinList(nameList)}."`);
+
+  // Sentence 2: one item detail
+  const sorted = [...entries].sort((a,b) => b[1] - a[1]);
+  if (sorted.length > 0) {
+    const [topKey, topCount] = sorted[0];
+    const topDef = ITEMS[topKey];
+    if (topCount > 1) {
+      sentences.push(`"I put ${numberWord(topCount)} ${topDef.label.toLowerCase()}s in my room because I really like them!"`);
+    } else {
+      sentences.push(`"I put ${topDef.article} ${topDef.label.toLowerCase()} in my room because I think it's cool."`);
+    }
+  }
+
+  // Sentence 3: total count
+  sentences.push(`"There ${total === 1 ? 'is' : 'are'} ${numberWord(total)} thing${total > 1 ? 's' : ''} in my room."`);
+
+  const sentenceHTML = sentences.map(s => `<div class="result-sentence">${s}</div>`).join('');
+
+  result.innerHTML = `
+    <div class="analysis-card">
+      <div class="analysis-type">You are: ${aType}</div>
+      <div class="analysis-text">${aText}</div>
+    </div>
+    <div class="result-heading">🎤 Your Room Has:</div>
+    <div class="result-list">${listHTML}</div>
+    <div class="result-heading">Try Saying:</div>
+    ${sentenceHTML}
+    <p class="result-prompt">Now make your own sentence!<br>"I like my room because ___."</p>
+  `;
+}
+
+function numberWord(n) {
+  const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten'];
+  return n <= 10 ? words[n] : String(n);
+}
+
+function joinList(arr) {
+  if (arr.length === 1) return arr[0];
+  if (arr.length === 2) return arr[0] + ' and ' + arr[1];
+  return arr.slice(0, -1).join(', ') + ', and ' + arr[arr.length - 1];
 }
 </script>
 
